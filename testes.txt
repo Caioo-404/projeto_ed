@@ -1,0 +1,5 @@
+-> Coisas para estudar
+- Algoritmos de Huffman
+- Heap
+- Manipulação de arquivos
+-
