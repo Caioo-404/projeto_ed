@@ -4,8 +4,19 @@
 - Manipulação de arquivos
 
 
+->Etapas de huffman
+-Determinar frequência de cada caracter
+-Montar uma árvore binária ordenando pela frequência de cada caracter
+-Percorrer a árvore para codificar ou decodificar
+
+
+
+
+
+
+
+
 --- Principais coisas do tkinter: ---
-{
 import tkinter as tk
 
 # Função que é chamada quando o botão é clicado
@@ -28,7 +39,12 @@ mensagem_label.pack()
 
 # Iniciar o loop principal da interface gráfica
 janela.mainloop()
-}
+
+
+
+
+
+
 
 
 --- tabela decodificação (teste) ---
