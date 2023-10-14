@@ -30,6 +30,7 @@ mensagem_label.pack()
 janela.mainloop()
 }
 
+
 --- tabela decodificação (teste) ---
 
 d = {'a': "0",
