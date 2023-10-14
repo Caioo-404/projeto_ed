@@ -2,4 +2,55 @@
 - Algoritmos de Huffman
 - Heap
 - Manipulação de arquivos
--
+
+
+--- Principais coisas do tkinter: ---
+{
+import tkinter as tk
+
+# Função que é chamada quando o botão é clicado
+def mostrar_mensagem():
+    mensagem_label.config(text="Olá, Mundo!")
+
+# Criar uma janela
+janela = tk.Tk()
+janela.title("Exemplo de Interface em Python")
+
+# Criar um botão
+botao = tk.Button(janela, text="Clique-me!", command=mostrar_mensagem)
+
+# Criar um rótulo para exibir a mensagem
+mensagem_label = tk.Label(janela, text="")
+
+# Colocar o botão e o rótulo na janela
+botao.pack()
+mensagem_label.pack()
+
+# Iniciar o loop principal da interface gráfica
+janela.mainloop()
+}
+
+--- tabela decodificação (teste) ---
+
+d = {'a': "0",
+     "b": "10",
+     "c": "110"}
+
+#abbca -> 010101100
+#
+
+text = "010101100"
+control = "nop"
+a = ""
+for i in range(len(text)):
+    if control == "yep":
+        a = text[i]
+        control = "nop"
+    else:
+        a += text[i]
+        
+    for k, v in d.items():
+        if a == v:
+            print(k, end="")
+            control = "yep"
+            break
