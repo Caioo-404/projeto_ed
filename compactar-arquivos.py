@@ -36,8 +36,8 @@ def contrucaoArvore(text):
     #Construir a árvore de Huffman
     while len(listaNo) > 1:
         #Remover elementos de menor frequência
-        esquerda = heapq.heappop(priority_queue)
-        direita = heapq.heappop(priority_queue)
+        esquerda = heapq.heappop(listaNo)
+        direita = heapq.heappop(listaNo)
 
         #Crio um nó com valor vazio e com frequência sendo a soma dos outros nós
         merge = node(None, esquerda.freq + direita.freq)
