@@ -18,8 +18,8 @@ class Node:
         return self.freq < outro.freq
     
     def __eq__(self, outro ):
-        return self.freq == outro.freq
-        
+        return self.freq == outro.freq and self.char == outro.char       
+
 
 #Construir árvore huffman 
 def contrucaoArvore(text):
@@ -42,11 +42,14 @@ def contrucaoArvore(text):
         #Remover elementos de menor frequência
         esquerda = heapq.heappop(listaNo)
         direita = heapq.heappop(listaNo)
+        print(esquerda, direita)
 
         #Crio um nó com valor vazio e com frequência sendo a soma dos outros nós
         merge = Node(None, esquerda.freq + direita.freq)
         merge.left = esquerda
         merge.right = direita
+        print(f'\nMerge dos nós {esquerda} + {direita}:', merge)
+        print('---'*15)
 
         #Coloco o nó de volta na fila
         heapq.heappush(listaNo, merge)
@@ -67,6 +70,7 @@ def criarHuffmanCod(no, codigoDaLetra, dicio):
     criarHuffmanCod(no.left, codigoDaLetra + "0", dicio)
     criarHuffmanCod(no.right, codigoDaLetra + "1", dicio)
 
+
 #Cromprimir
 def compactar(dados):
     arvore = contrucaoArvore(dados)
@@ -75,9 +79,48 @@ def compactar(dados):
     textoCodificado = "".join(huffmanCodigos[char] for char in dados)
     return textoCodificado, arvore, huffmanCodigos
 
+
+#Descomprimir 
+def descompactar(textoCodi, arvoreHuff):
+    nodeH = arvoreHuff
+    descodificado = ""
+
+    for bit in textoCodi:
+        if bit == '0':
+            nodeH = nodeH.left
+        else:
+            nodeH = nodeH.right
+
+        if nodeH.char is not None:
+            descodificado += nodeH.char
+            nodeH = arvoreHuff
+
+    return descodificado
+
+
 #Main
-textao = "ta bad"
-jacod, tree, d = compactar(textao)
-print("Input:", textao)
-print("Compactado:", jacod)
-print("Dicionário e códigos:", d)
+'''
+textao = "qualquer coisaaa"
+jacod, tree, di = compactar(textao)
+jadecod = descompactar(jacod, tree)
+print("\nInput (texto):", textao)
+print("\nCompactado:", jacod)
+print("\nDescompactado:", jadecod)
+print("\nDicionário e códigos:", di)
+
+
+
+#Abrir e ler o arquivo:
+with open("texto.txt", "r", encoding="utf-8") as arquivo:
+    textoConteudo = arquivo.read()
+
+#compactar e criar um novo arquivo compresso
+jacod, tree, dic = compactar(texto)
+jadecod = descompactar(jacod, tree)
+
+with open("compresso.bin, "w+") as file:
+    file.write(jacod)
+
+with open("descompresso.bin", "w+") as file:
+    file.write(jadecod)
+'''
