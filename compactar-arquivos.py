@@ -1,4 +1,5 @@
 import heapq
+import pickle
 
 #Criando uma classe de nós huffman
 class Node:
@@ -97,6 +98,65 @@ def descompactar(textoCodi, arvoreHuff):
 
     return descodificado
 
+
+#Criar o arquivo em binário
+def arquivoBin(tree, textoCod, nomeArq):
+    nomeArq += ".bin"
+    sequenciaBits = textoCod
+    with open(nomeArq, "wb+") as arquivo:
+        #Colocar a arvore no arq
+        pickle.dump(tree, arquivo)
+
+        #Colocar o texto
+        byte = 0
+        bitsEscritos = 0
+        for bit in sequenciaBits:
+            byte = (byte << 1) | int(bit)
+            bitsEscritos += 1
+
+            if bitsEscritos == 8:
+                arquivo.write(bytes([byte]))
+                byte = 0
+                bitsEscritos = 0
+
+        if bitsEscritos > 0:
+            byte <<= 8 - bitsEscritos
+            arquivo.write(bytes([byte]))
+
+
+#Tirar o arq de binário
+def rollback(nomeArq):
+    #Abrir o arquivo
+    with open(nomeArq, "rb+") as arquivo:
+        #Pego a árvore e o texto (byte)
+        arvore = pickle.load(arquivo)
+        bytes_lidos = arquivo.read()
+        
+    bits = []
+    #Percorra cada byte lido
+    for byte in bytes_lidos:
+        #Converte o byte em uma sequência de 8 bits
+        byte_bits = format(byte, '08b')
+        #Adiciona os bits à lista
+        bits.extend(byte_bits)
+
+    #Converte a lista de bits de volta para uma sequência de bits como uma string
+    sequencia_bits = "".join(bits)
+        
+    return descompactar(sequencia_bits, arvore)
+
+
+with open("texto1.txt.txt", "r") as file:
+    textao = file.read()
+
+jacod, tre, di = compactar(textao)
+
+arquivoBin(tre, jacod, "newlucky")
+
+deecodificado = rollback("newlucky.bin")
+
+with open("descompresso.bin", "w+") as file:
+    file.write(deecodificado)
 
 #Main
 '''
