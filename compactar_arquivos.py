@@ -1,5 +1,6 @@
 import heapq
 import pickle
+from bitarray import bitarray
 
 #Criando uma classe de nós huffman
 class Node:
@@ -102,46 +103,24 @@ def descompactar(textoCodi, arvoreHuff):
 #Criar o arquivo em binário
 def arquivoBin(tree, textoCod, nomeArq):
     nomeArq += ".bin"
-    sequenciaBits = textoCod
+    sequenciaBits = bitarray(textoCod)
+
     with open(nomeArq, "wb+") as arquivo:
-        #Colocar a arvore no arq
-        pickle.dump(tree, arquivo)
-
-        #Colocar o texto
-        byte = 0
-        bitsEscritos = 0
-        for bit in sequenciaBits:
-            byte = (byte << 1) | int(bit)
-            bitsEscritos += 1
-
-            if bitsEscritos == 8:
-                arquivo.write(bytes([byte]))
-                byte = 0
-                bitsEscritos = 0
-
-        if bitsEscritos > 0:
-            byte <<= 8 - bitsEscritos
-            arquivo.write(bytes([byte]))
+        # Colocar a árvore no arquivo
+        listinha = [tree, len(textoCod)]
+        pickle.dump(listinha, arquivo)
+        arquivo.write(sequenciaBits.tobytes())
 
 
 #Tirar o arq de binário
 def rollback(nomeArq):
+    bitsLidos = bitarray()
     #Abrir o arquivo
     with open(nomeArq, "rb+") as arquivo:
         #Pego a árvore e o texto (byte)
-        arvore = pickle.load(arquivo)
-        bytes_lidos = arquivo.read()
-        
-    bits = []
-    #Percorra cada byte lido
-    for byte in bytes_lidos:
-        #Converte o byte em uma sequência de 8 bits
-        byte_bits = format(byte, '08b')
-        #Adiciona os bits à lista
-        bits.extend(byte_bits)
+        arvore_Len = pickle.load(arquivo)
+        bitsLidos.frombytes(arquivo.read())
 
-    #Converte a lista de bits de volta para uma sequência de bits como uma string
-    sequencia_bits = "".join(bits)
-        
-    return descompactar(sequencia_bits, arvore)
-
+    bitsLidos = bitsLidos[:arvore_Len[1]]
+    sequenciaBits = bitsLidos.to01()
+    return descompactar(sequenciaBits, arvore_Len[0])

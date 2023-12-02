@@ -1,13 +1,27 @@
 import tkinter as tk
+import os
 from tkinter import filedialog
 from compactar_arquivos import *
 
 def escolherArquivo():
     filepath = filedialog.askopenfilename()
+
+    if filepath:
+        #O nome do arquivo e a extensão
+        nome_arquivo, extensao = os.path.splitext(os.path.basename(filepath))
+
+        if extensao == ".txt":
+            novo_nome = f"{nome_arquivo}_Binário"
+        else:
+            novo_nome = f"{nome_arquivo}_Descompactado.txt"
+
+        entrarNome.delete(0, tk.END)
+        entrarNome.insert(0, novo_nome)
+
     entrarArquivo.delete(0, tk.END)
     entrarArquivo.insert(0, filepath)
 
-
+    
 def compactarIG():
     enderecoFile = entrarArquivo.get()
     newName = entrarNome.get()
@@ -28,7 +42,7 @@ def compactarIG():
 
 def descompactarIG():
     enderecoFile = entrarArquivo.get()
-    newName = entrarNome.get()
+    newName = entrarNome.get() + ".txt"
 
     if not enderecoFile or not newName:
         status.config(text="Por favor, escolha um arquivo e digite um novo nome.")
