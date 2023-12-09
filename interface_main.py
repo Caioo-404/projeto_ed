@@ -1,6 +1,6 @@
 import tkinter as tk
-import os
 from tkinter import filedialog
+import os
 from compactar_arquivos import *
 
 def escolherArquivo():
@@ -10,10 +10,10 @@ def escolherArquivo():
         #O nome do arquivo e a extensão
         nome_arquivo, extensao = os.path.splitext(os.path.basename(filepath))
 
-        if extensao == ".txt":
+        if extensao != ".bin":
             novo_nome = f"{nome_arquivo}_Binário"
         else:
-            novo_nome = f"{nome_arquivo}_Descompactado.txt"
+            novo_nome = f"{nome_arquivo}_Descompactado"
 
         entrarNome.delete(0, tk.END)
         entrarNome.insert(0, novo_nome)
@@ -21,7 +21,7 @@ def escolherArquivo():
     entrarArquivo.delete(0, tk.END)
     entrarArquivo.insert(0, filepath)
 
-    
+
 def compactarIG():
     enderecoFile = entrarArquivo.get()
     newName = entrarNome.get()
@@ -30,8 +30,16 @@ def compactarIG():
         status.config(text="Por favor, escolha um arquivo e digite um novo nome.")
         return
 
-    with open(enderecoFile, 'r', encoding="utf-8") as file:
-        data = file.read()
+    with open(enderecoFile, 'rb') as file:
+        bits = bitarray()
+        bits.fromfile(file)
+        bits = bits.to01()
+
+        data = list()
+        tam = 0
+        for i in range(0, len(bits), 8):
+            tam += 8
+            data.append(bits[i:tam])
 
     dataCompactada, arvoreHuffman, dictDeHuffman = compactar(data)
 
@@ -42,7 +50,7 @@ def compactarIG():
 
 def descompactarIG():
     enderecoFile = entrarArquivo.get()
-    newName = entrarNome.get() + ".txt"
+    newName = entrarNome.get()
 
     if not enderecoFile or not newName:
         status.config(text="Por favor, escolha um arquivo e digite um novo nome.")
@@ -50,8 +58,8 @@ def descompactarIG():
     
     textoDescompactado = rollback(enderecoFile)
 
-    with open(newName, "w+", encoding="utf-8") as file:
-        file.write(textoDescompactado)
+    with open(newName, "wb+") as file:
+        file.write(textoDescompactado.tobytes())
 
     status.config(text=f"Arquivo descompactado e salvo como: {newName}")
 
@@ -91,4 +99,3 @@ status.grid(row=3, column=0, columnspan=2)
 
 
 janela.mainloop()
-

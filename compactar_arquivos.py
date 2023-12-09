@@ -1,8 +1,8 @@
 import heapq
 import pickle
+from bitarray import bitarray
 import subprocess
 import sys
-from bitarray import bitarray
 
 #Criando uma classe de nós huffman
 class Node:
@@ -26,10 +26,10 @@ class Node:
 
 
 #Construir árvore huffman 
-def contrucaoArvore(text):
+def contrucaoArvore(data):
     #Ver frequência de cada caracter e colocar em um dict:
     frequencia = dict()
-    for char in text:
+    for char in data:
         if char in frequencia:
             frequencia[char] += 1
         else:
@@ -99,10 +99,10 @@ def descompactar(textoCodi, arvoreHuff):
             descodificado += nodeH.char
             nodeH = arvoreHuff
 
+    descodificado = bitarray(descodificado)
     return descodificado
 
 
-#Criar o arquivo em binário
 def arquivoBin(tree, textoCod, nomeArq):
     nomeArq += ".bin"
     sequenciaBits = bitarray(textoCod)
@@ -125,19 +125,13 @@ def rollback(nomeArq):
 
     bitsLidos = bitsLidos[:arvore_Len[1]]
     sequenciaBits = bitsLidos.to01()
+
     return descompactar(sequenciaBits, arvore_Len[0])
 
 
-
 #Compactar usando o terminal
-#Def para ajudar a organizar melhor
-def compactarComTerminal(texto, nomeSaida):
-    textoCodificado, arvore, huffman_codigos = compactar(texto)
-    arquivoBin(arvore, textoCodificado, nomeSaida)
-
-
 if __name__ == "__main__":
-    # Verifica se foram fornecidos três argumentos na linha de comando
+    #Verifica se foram fornecidos três argumentos na linha de comando
     if len(sys.argv) != 4:
         print("Modo de Uso: python testesHuff.py compress/descompress nome_arquivo.txt nome_arquivo_saida")
     else:
@@ -147,24 +141,35 @@ if __name__ == "__main__":
 
         #Modo de compressão
         if modo == "compress":
-            with open(arquivoParaProcessar, "r+", encoding="utf-8") as arq:
-                texto = arq.read()
-                compactarComTerminal(texto, novoNome)
+            with open(arquivoParaProcessar, "rb+") as file:
+                bits = bitarray()
+                bits.fromfile(file)
+                bits = bits.to01()
+
+                data = list()
+                tam = 0
+                for i in range(0, len(bits), 8):
+                    tam += 8
+                    data.append(bits[i:tam])
+
+            dataCompactada, arvoreHuffman, dictDeHuffman = compactar(data)
+
+            arquivoBin(arvoreHuffman, dataCompactada, novoNome)
+
             print(f"Arquivo compactado salvo como {novoNome}.bin")
 
 
         #Modo de descompressão
         elif modo == "descompress":
             arquivoDescompactado = rollback(arquivoParaProcessar)
-            with open(f"{novoNome}.txt", "w+", encoding="utf-8") as arq:
-                arq.write(arquivoDescompactado)
-            print(f"Arquivo descompactado salvo como {novoNome}.txt")
+
+            with open(novoNome, "wb+") as file:
+                file.write(arquivoDescompactado.tobytes())
+
+            print(f"Arquivo descompactado salvo como {novoNome}")
 
         else:
             print("Modo não reconhecido. Use 'compress' ou 'descompress'.")
 
 #Como usar no terminal:
-#Modo de Uso: python "nomedoprograma" compress/descompress nome_arquivo.txt nome_arquivo_saida
-#Exemplo(compress): python compactar_arquivos.py compress texto2.txt texto2Compac
-#Exemplo(descompress): python compactar_arquivos.py descompress texto2Compac.bin texto2Descompac
-#Obs é bom usar o cd para o local da pasta ex: cd "C:\Users\PC\Documents\Códigos\VS Code Algs\Python\Ed"
+#"Modo de Uso: python testesHuff.py compress/descompress nome_arquivo.txt nome_arquivo_saida"
